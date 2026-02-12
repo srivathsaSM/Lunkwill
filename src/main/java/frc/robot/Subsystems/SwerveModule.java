@@ -6,7 +6,9 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkRelativeEncoder;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.ResetMode;
+import com.revrobotics.spark.config.EncoderConfig;
 import com.revrobotics.spark.config.SparkBaseConfig;
+import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.PersistMode;
 import com.revrobotics.RelativeEncoder;
@@ -18,6 +20,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import frc.robot.Constants;
+import frc.robot.util.LoggedTunableNumber;
 
 public class SwerveModule extends SubsystemBase {
   /** Creates a new SwerveModule. */
@@ -33,6 +36,8 @@ public class SwerveModule extends SubsystemBase {
   private final boolean absoluteEncoderReversed;
   private final double absoluteEncoderOffset;
 
+  private final LoggedTunableNumber kPRotation = new LoggedTunableNumber("Tuning/kPRotation", 0.3);
+
   public SwerveModule(int driveMotorID, int rotationMotorID, int absoluteEncoderID, boolean absoluteEncoderReversed, double absoluteEncoderOffset, boolean driveInverted, boolean rotationInverted) {
     //motors
     this.driveMotor = new SparkMax(driveMotorID, MotorType.kBrushless);
@@ -43,21 +48,20 @@ public class SwerveModule extends SubsystemBase {
     this.rotationEncoder = rotationMotor.getEncoder();
     this.absoluteEncoder = new CANcoder(absoluteEncoderID);
 
-    //drive config
+    //drive motor config
     SparkMaxConfig driveConfig = new SparkMaxConfig();
     driveConfig.inverted(driveInverted);
     driveConfig.encoder.positionConversionFactor((Math.PI * Constants.wheelDiameterMeters)/Constants.driveMotorGearRatio);
     driveConfig.encoder.velocityConversionFactor((Math.PI * Constants.wheelDiameterMeters)/(60 * Constants.driveMotorGearRatio));
     this.driveMotor.configure(driveConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
-    //rotation config
+    //rotation motor config
     SparkMaxConfig rotationConfig = new SparkMaxConfig();
     rotationConfig.inverted(rotationInverted);
     rotationConfig.closedLoop.pid(Constants.kPRotation,Constants.kIRotation, Constants.kDRotation);
     rotationConfig.closedLoop.positionWrappingEnabled(true);
-    rotationConfig.closedLoop.positionWrappingMaxInput(Math.PI);
-    rotationConfig.closedLoop.positionWrappingMinInput(-Math.PI);
-    rotationConfig.encoder.positionConversionFactor(2*Math.PI/Constants.rotationMotorGearRatio);
+    rotationConfig.closedLoop.positionWrappingInputRange(-Math.PI,Math.PI);
+    rotationConfig.encoder.positionConversionFactor(Constants.rotationsToRad/Constants.rotationMotorGearRatio);
     this.rotationMotor.configure(rotationConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
     this.absoluteEncoderReversed = absoluteEncoderReversed;
@@ -85,7 +89,7 @@ public class SwerveModule extends SubsystemBase {
   }
 
   public double getAbsolutePosition() {
-    return absoluteEncoder.getAbsolutePosition().getValueAsDouble() - absoluteEncoderOffset;
+    return absoluteEncoder.getAbsolutePosition().getValueAsDouble();
   }
 
   public double getAbsolutePositionRad() {
@@ -93,8 +97,10 @@ public class SwerveModule extends SubsystemBase {
   }
 
   public void resetEncoders() {
+    //sets drive encoder to set the current position to 0
+    //sets the rotation relative encoder sync with the absolute encoder
     driveEncoder.setPosition(0);
-    rotationEncoder.setPosition(0);
+    rotationEncoder.setPosition(absoluteEncoder.getAbsolutePosition().getValueAsDouble()*Constants.rotationsToRad);
   }
 
   public SwerveModuleState getState() {
@@ -103,16 +109,19 @@ public class SwerveModule extends SubsystemBase {
 
   public void straighten() {
     SparkClosedLoopController rotationController = rotationMotor.getClosedLoopController();
-    rotationController.setSetpoint(absoluteEncoderOffset*Constants.rotationsToRad,ControlType.kPosition);
+    rotationController.setSetpoint(absoluteEncoderOffset * Constants.rotationsToRad,ControlType.kPosition);
     rotationEncoder.setPosition(0);
   }
 
   public void setDesiredState(SwerveModuleState state) {
+    if (Math.abs(state.speedMetersPerSecond) < 0.001) {
+      stop();
+      return;
+    }
     state.optimize(getState().angle);
     driveMotor.set(state.speedMetersPerSecond/Constants.physicalMaxSpeedMetersPerSec);
     SparkClosedLoopController rotationController = rotationMotor.getClosedLoopController();
     rotationController.setSetpoint(state.angle.getRadians(),ControlType.kPosition);
-    //if rotation on swerve modules resets after every time we stop moving joysticks, refer to 9:40
   }
 
   public void stop() {
@@ -123,5 +132,13 @@ public class SwerveModule extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    LoggedTunableNumber.ifChanged(
+      hashCode(),
+      () -> {
+        SparkMaxConfig tempConfig = new SparkMaxConfig();
+        tempConfig.closedLoop.pid(kPRotation.get(), 0, 0);
+        rotationMotor.configure(tempConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
+      },
+      kPRotation);
   }
 }

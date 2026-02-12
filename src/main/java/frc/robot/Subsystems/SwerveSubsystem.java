@@ -78,14 +78,23 @@ public class SwerveSubsystem extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run
     SmartDashboard.putNumber("Robot Heading", getHeading());
-    SwerveModuleState[] states = new SwerveModuleState[4];
 
-    states[0] = frontLeft.getState();
-    states[1] = frontRight.getState();
-    states[2] = backLeft.getState();
-    states[3] = backRight.getState();
+    SmartDashboard.putNumber("Rot FR", frontRight.getAbsolutePositionRad());
+    SmartDashboard.putNumber("Rot FL", frontLeft.getAbsolutePositionRad());
+    SmartDashboard.putNumber("Rot BR", backRight.getAbsolutePositionRad());
+    SmartDashboard.putNumber("Rot BL", backLeft.getAbsolutePositionRad());
 
-    Logger.recordOutput("States", states);
+    SmartDashboard.putNumber("State Radians FR: ", frontRight.getState().angle.getRadians());
+    SmartDashboard.putNumber("Actual Radians FR: ", frontRight.getRotationPosition());
+
+    SmartDashboard.putNumber("State Radians FL: ", frontLeft.getState().angle.getRadians());
+    SmartDashboard.putNumber("Actual Radians FL: ", frontLeft.getRotationPosition());
+
+    SmartDashboard.putNumber("State Radians BR: ", backRight.getState().angle.getRadians());
+    SmartDashboard.putNumber("Actual Radians BR: ", backRight.getRotationPosition());
+
+    SmartDashboard.putNumber("State Radians BL: ", backLeft.getState().angle.getRadians());
+    SmartDashboard.putNumber("Actual Radians BL: ", backLeft.getRotationPosition());
   }
 
   public void stopModules() {

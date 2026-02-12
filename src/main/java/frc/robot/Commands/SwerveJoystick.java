@@ -56,12 +56,11 @@ public class SwerveJoystick extends Command {
     ySpeed = yLimiter.calculate(ySpeed) * Constants.physicalMaxSpeedMetersPerSec;
     rotSpeed = rotLimiter.calculate(rotSpeed) * Constants.maxAngularSpeedRadPerSec;
 
-
     //consider deleting this for drift problems (according to GPT)
-    if (xSpeed == 0 && ySpeed == 0 && rotSpeed == 0) {
-      swerveSubsystem.stopModules();
-      return;
-    }
+    // if (xSpeed == 0 && ySpeed == 0 && rotSpeed == 0) {
+    //   swerveSubsystem.stopModules();
+    //   return;
+    // }
 
     //constructs chassisSpeeds
     ChassisSpeeds chassisSpeeds;

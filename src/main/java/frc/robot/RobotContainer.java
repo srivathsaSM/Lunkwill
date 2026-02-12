@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Subsystems.SwerveSubsystem;
 import frc.robot.Constants;
+import frc.robot.Commands.GoToAngle;
 import frc.robot.Commands.SwerveJoystick;
 import frc.robot.Commands.ZeroHeading;
 
@@ -26,14 +27,15 @@ public class RobotContainer {
       () -> -joystick.getRawAxis(Constants.driverYAxis),
       () -> -joystick.getRawAxis(Constants.driverXAxis),
       () -> joystick.getRawAxis(Constants.driverRotAxis),
-      () -> !joystick.getRawButton(Constants.driverFieldOrientedButtonIndex))); //this should be NOT so that the field oriented is on by defualt
+      () -> joystick.getRawButton(Constants.driverFieldOrientedButtonIndex))); //this should be NOT so that the field oriented is on by defualt
       //removing the NOT makes robot oriented drive on by default (good for testing)
     
     configureBindings();
   }
 
   private void configureBindings() {
-    new JoystickButton(joystick, Constants.zeroHeadingButtonIndex).onTrue(new ZeroHeading(swerveSubsystem));
+    new JoystickButton(joystick, Constants.zeroHeadingButtonIndex).whileTrue(new ZeroHeading(swerveSubsystem));
+    new JoystickButton(joystick, 3).whileTrue(new GoToAngle(swerveSubsystem, Math.PI/2));
   }
 
   public Command getAutonomousCommand() {

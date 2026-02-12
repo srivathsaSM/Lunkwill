@@ -34,16 +34,15 @@ public class Constants {
     public static final int backLeftEncoderID = 10;
 
     //rotation encoder offsets
-    //NOTE: CHECK IF THE OFFSETS ARE RADIANS OR ROTATIONS (CONVERSION MESS)
-    public static final double frontRightEncoderOffset = 0.713623;
+    public static final double frontRightEncoderOffset = 0.713623; //Rad: 
     public static final double backRightEncoderOffset = 0.49707;
     public static final double frontLeftEncoderOffset = 0.795898;
-    public static final double backLeftEncoderOffset = -0.60498;
+    public static final double backLeftEncoderOffset = 0.60498;
 
     //drive motor reversed states
     public static final boolean frontRightReversed = false;
-    public static final boolean backRightReversed = true;
-    public static final boolean frontLeftReversed = true;
+    public static final boolean backRightReversed = false;
+    public static final boolean frontLeftReversed = false;
     public static final boolean backLeftReversed = false;
 
     //rotation encoder reversed 
@@ -54,6 +53,7 @@ public class Constants {
     public static final boolean backLeftAbsReversed = false;
 
     //rotation Motor reversed
+    //NOTE: TRY INVERTING FRONT RIGHT AND BACK LEFT 
     public static final boolean frontRightRotReversed = false;
     public static final boolean backRightRotReversed = false;
     public static final boolean frontLeftRotReversed = false;
@@ -65,7 +65,7 @@ public class Constants {
     public static final double rotationsToRad = 2*Math.PI;
 
     //swerve PID
-    public static final double kPRotation = 0.3;
+    public static final double kPRotation = 0;
     public static final double kIRotation = 0;
     public static final double kDRotation = 0;
 
@@ -101,5 +101,7 @@ public class Constants {
         new Translation2d(wheelBase/2, trackWidth/2),  //front right
         new Translation2d(-wheelBase/2, -trackWidth/2), //back left
         new Translation2d(-wheelBase/2, trackWidth/2));  //back right
+    
+    public static final boolean tuningMode = true;
 }
 

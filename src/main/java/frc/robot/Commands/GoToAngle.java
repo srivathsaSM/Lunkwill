@@ -7,6 +7,7 @@ package frc.robot.Commands;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Subsystems.SwerveModule;
 import frc.robot.Subsystems.SwerveSubsystem;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
@@ -26,12 +27,14 @@ public class GoToAngle extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    Rotation2d angle = new Rotation2d(angleRad);
-    SwerveModuleState[] states = new SwerveModuleState[4];
-    for (int i = 0; i < 4; i++) {
-      states[i] = new SwerveModuleState(0,angle);
-    }
-    swerveSubsystem.setModuleStates(states);
+    // Rotation2d angle = new Rotation2d(angleRad);
+    // SwerveModuleState[] states = new SwerveModuleState[4];
+    // for (int i = 0; i < 4; i++) {
+    //   states[i] = new SwerveModuleState(0,angle);
+    // }
+    // swerveSubsystem.setModuleStates(states);
+    SwerveModule[] modules = swerveSubsystem.getModules();
+    modules[1].straighten();
   }
 
   // Called once the command ends or is interrupted.

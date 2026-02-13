@@ -26,7 +26,7 @@ public class RobotContainer {
       swerveSubsystem,
       () -> -joystick.getRawAxis(Constants.driverYAxis),
       () -> -joystick.getRawAxis(Constants.driverXAxis),
-      () -> joystick.getRawAxis(Constants.driverRotAxis),
+      () -> -joystick.getRawAxis(Constants.driverRotAxis),
       () -> joystick.getRawButton(Constants.driverFieldOrientedButtonIndex))); //this should be NOT so that the field oriented is on by defualt
       //removing the NOT makes robot oriented drive on by default (good for testing)
     

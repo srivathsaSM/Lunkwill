@@ -44,7 +44,7 @@ public class SwerveJoystick extends Command {
     //deadband
     xSpeed = Math.abs(xSpeed) > Constants.deadband ? xSpeed : 0.0;
     ySpeed = Math.abs(ySpeed) > Constants.deadband ? ySpeed : 0.0;
-    rotSpeed = Math.abs(rotSpeed) > Constants.deadband ? rotSpeed : 0.0;
+    rotSpeed = Math.abs(rotSpeed) > Constants.rotDeadband ? rotSpeed : 0.0;
 
     //squaring
     xSpeed = Math.copySign(xSpeed * xSpeed, xSpeed);

@@ -1,5 +1,6 @@
 package frc.robot.Subsystems;
 
+import com.ctre.phoenix6.configs.MagnetSensorConfigs;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkMax;
@@ -21,7 +22,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import frc.robot.Constants;
-import frc.robot.util.LoggedTunableNumber;
 
 public class SwerveModule extends SubsystemBase {
   /** Creates a new SwerveModule. */
@@ -36,8 +36,6 @@ public class SwerveModule extends SubsystemBase {
 
   private final boolean absoluteEncoderReversed;
   private final double absoluteEncoderOffset;
-
-  private final LoggedTunableNumber kPRotation = new LoggedTunableNumber("Tuning/kPRotation", 0.5);
 
   public SwerveModule(int driveMotorID, int rotationMotorID, int absoluteEncoderID, boolean absoluteEncoderReversed, double absoluteEncoderOffset, boolean driveInverted, boolean rotationInverted) {
     //motors
@@ -63,16 +61,19 @@ public class SwerveModule extends SubsystemBase {
     rotationConfig.idleMode(IdleMode.kBrake);
     rotationConfig.closedLoop.pid(Constants.kPRotation,Constants.kIRotation, Constants.kDRotation);
     rotationConfig.closedLoop.positionWrappingEnabled(true);
-    rotationConfig.closedLoop.positionWrappingInputRange(-2*Math.PI, 2*Math.PI);
+    rotationConfig.closedLoop.positionWrappingInputRange(-Math.PI, Math.PI);
     rotationConfig.encoder.positionConversionFactor(Constants.rotationsToRad/Constants.rotationMotorGearRatio);
     this.rotationMotor.configure(rotationConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
+    //cancoder config
+    MagnetSensorConfigs CANConfig = new MagnetSensorConfigs().withAbsoluteSensorDiscontinuityPoint(1.0);
+    absoluteEncoder.getConfigurator().apply(CANConfig);
 
     this.absoluteEncoderReversed = absoluteEncoderReversed;
     this.absoluteEncoderOffset = absoluteEncoderOffset;
     
     //need to configure PID stuff
     resetEncoders();
-    straighten();
   }
 
   public double getDrivePosition() {
@@ -103,7 +104,12 @@ public class SwerveModule extends SubsystemBase {
     //sets drive encoder to set the current position to 0
     //sets the rotation relative encoder sync with the absolute encoder
     driveEncoder.setPosition(0);
-    rotationEncoder.setPosition(absoluteEncoder.getAbsolutePosition().getValueAsDouble()*Constants.rotationsToRad);
+
+    //absoluteRadians (current reading) - offset radians (straight offset) = current angle (from straight)
+    double absoluteRadians = getAbsolutePositionRad();
+    double offsetRadians = absoluteEncoderOffset * Constants.rotationsToRad;
+
+    rotationEncoder.setPosition(absoluteRadians - offsetRadians);
   }
 
   public SwerveModuleState getState() {
@@ -112,9 +118,7 @@ public class SwerveModule extends SubsystemBase {
 
   public void straighten() {
     SparkClosedLoopController rotationController = rotationMotor.getClosedLoopController();
-    SmartDashboard.putNumber("Setpoint", absoluteEncoderOffset * 2 * Math.PI);
-    rotationController.setSetpoint(absoluteEncoderOffset * Constants.rotationsToRad,ControlType.kPosition);
-    rotationEncoder.setPosition(0);
+    rotationController.setSetpoint(0, ControlType.kPosition);
   }
 
   public void setDesiredState(SwerveModuleState state) {
@@ -136,13 +140,5 @@ public class SwerveModule extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    LoggedTunableNumber.ifChanged(
-      hashCode(),
-      () -> {
-        SparkMaxConfig tempConfig = new SparkMaxConfig();
-        tempConfig.closedLoop.pid(kPRotation.get(), 0, 0.1);
-        rotationMotor.configure(tempConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
-      },
-      kPRotation);
   }
 }

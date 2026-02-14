@@ -34,10 +34,10 @@ public class Constants {
     public static final int frontLeftEncoderID = 10;
 
     //rotation encoder offsets
-    public static final double backRightEncoderOffset = 0.486572;
-    public static final double backLeftEncoderOffset = 0.230469;
-    public static final double frontRightEncoderOffset = 0.527382;
-    public static final double frontLeftEncoderOffset = 0.369141;
+    public static final double backRightEncoderOffset = 0.972412 * 2 * Math.PI;
+    public static final double backLeftEncoderOffset = 0.239746 * 2 * Math.PI;
+    public static final double frontRightEncoderOffset = 0.536377 * 2 * Math.PI;
+    public static final double frontLeftEncoderOffset = 0.393799 * 2 * Math.PI;
 
     //drive motor reversed states
     public static final boolean frontRightReversed = false;
@@ -52,10 +52,10 @@ public class Constants {
     public static final boolean backLeftAbsReversed = false;
 
     //rotation Motor reversed
-    public static final boolean frontRightRotReversed = false;
-    public static final boolean backRightRotReversed = false;
-    public static final boolean frontLeftRotReversed = false;
-    public static final boolean backLeftRotReversed = false;
+    public static final boolean frontRightRotReversed = true;
+    public static final boolean backRightRotReversed = true;
+    public static final boolean frontLeftRotReversed = true;
+    public static final boolean backLeftRotReversed = true;
 
 
     //conversion factors
@@ -65,7 +65,7 @@ public class Constants {
     //swerve PID
     public static final double kPRotation = 0.3;
     public static final double kIRotation = 0;
-    public static final double kDRotation = 0.1;
+    public static final double kDRotation = 0;
 
     //swerve drive hardware specifications
     public static final double wheelDiameterMeters = Units.inchesToMeters(4.0 / 1.04085);
@@ -100,7 +100,5 @@ public class Constants {
         new Translation2d(wheelBase/2, trackWidth/2),  //front right
         new Translation2d(-wheelBase/2, -trackWidth/2), //back left
         new Translation2d(-wheelBase/2, trackWidth/2));  //back right
-    
-    public static final boolean tuningMode = true;
 }
 

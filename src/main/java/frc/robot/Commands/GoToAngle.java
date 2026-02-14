@@ -34,7 +34,9 @@ public class GoToAngle extends Command {
     // }
     // swerveSubsystem.setModuleStates(states);
     SwerveModule[] modules = swerveSubsystem.getModules();
-    modules[1].straighten();
+    for (SwerveModule module : modules) {
+      module.straighten();
+    }
   }
 
   // Called once the command ends or is interrupted.

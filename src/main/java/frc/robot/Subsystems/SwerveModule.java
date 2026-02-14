@@ -72,8 +72,8 @@ public class SwerveModule extends SubsystemBase {
     this.absoluteEncoderReversed = absoluteEncoderReversed;
     this.absoluteEncoderOffset = absoluteEncoderOffset;
     
-    //need to configure PID stuff
     resetEncoders();
+    straighten();
   }
 
   public double getDrivePosition() {
@@ -97,7 +97,7 @@ public class SwerveModule extends SubsystemBase {
   }
 
   public double getAbsolutePositionRad() {
-    return getAbsolutePosition() * 2 * Math.PI * (absoluteEncoderReversed ? -1.0 : 1.0);
+    return getAbsolutePosition() * Constants.rotationsToRad * (absoluteEncoderReversed ? -1.0 : 1.0);
   }
 
   public void resetEncoders() {
@@ -107,9 +107,8 @@ public class SwerveModule extends SubsystemBase {
 
     //absoluteRadians (current reading) - offset radians (straight offset) = current angle (from straight)
     double absoluteRadians = getAbsolutePositionRad();
-    double offsetRadians = absoluteEncoderOffset * Constants.rotationsToRad;
 
-    rotationEncoder.setPosition(absoluteRadians - offsetRadians);
+    rotationEncoder.setPosition(absoluteRadians - absoluteEncoderOffset);
   }
 
   public SwerveModuleState getState() {

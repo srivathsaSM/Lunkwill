@@ -34,28 +34,28 @@ public class Constants {
     public static final int frontLeftEncoderID = 10;
 
     //rotation encoder offsets
-    public static final double backRightEncoderOffset = 0.972412 * 2 * Math.PI;
-    public static final double backLeftEncoderOffset = 0.239746 * 2 * Math.PI;
-    public static final double frontRightEncoderOffset = 0.536377 * 2 * Math.PI;
-    public static final double frontLeftEncoderOffset = 0.393799 * 2 * Math.PI;
+    public static final double backRightEncoderOffset = -0.972412 * 2 * Math.PI;
+    public static final double backLeftEncoderOffset = -0.239746 * 2 * Math.PI;
+    public static final double frontRightEncoderOffset = -0.536377 * 2 * Math.PI;
+    public static final double frontLeftEncoderOffset = -0.364014  * 2 * Math.PI;
 
     //drive motor reversed states
     public static final boolean frontRightReversed = false;
     public static final boolean backRightReversed = false;
-    public static final boolean frontLeftReversed = false;
+    public static final boolean frontLeftReversed = true;
     public static final boolean backLeftReversed = false;
 
     //rotation encoder reversed 
-    public static final boolean frontRightAbsReversed = false;
-    public static final boolean backRightAbsReversed = false;
-    public static final boolean frontLeftAbsReversed = false;
-    public static final boolean backLeftAbsReversed = false;
+    public static final boolean frontRightAbsReversed = true;
+    public static final boolean backRightAbsReversed = true;
+    public static final boolean frontLeftAbsReversed = true;
+    public static final boolean backLeftAbsReversed = true;
 
     //rotation Motor reversed
-    public static final boolean frontRightRotReversed = true;
-    public static final boolean backRightRotReversed = true;
-    public static final boolean frontLeftRotReversed = true;
-    public static final boolean backLeftRotReversed = true;
+    public static final boolean frontRightRotReversed = false;
+    public static final boolean backRightRotReversed = false;
+    public static final boolean frontLeftRotReversed = false;
+    public static final boolean backLeftRotReversed = false;
 
 
     //conversion factors
@@ -76,7 +76,7 @@ public class Constants {
     public static final double driveEncoderRPMToMetersPerSec = driveEncoderRotationToMeters/60;
     public static final double rotationEncoderRPMToRadPerSec = rotationEncoderRotationToRad/60;
 
-    public static final double physicalMaxSpeedMetersPerSec = 0.5; // 7.5/4.0
+    public static final double physicalMaxSpeedMetersPerSec = 7.5/4.0; // 7.5/4.0
     public static final double maxAngularSpeedRadPerSec = 3.5;
 
     //deadband

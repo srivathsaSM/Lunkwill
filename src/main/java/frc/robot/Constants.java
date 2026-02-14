@@ -40,10 +40,10 @@ public class Constants {
     public static final double frontLeftEncoderOffset = -0.364014  * 2 * Math.PI;
 
     //drive motor reversed states
-    public static final boolean frontRightReversed = false;
-    public static final boolean backRightReversed = false;
-    public static final boolean frontLeftReversed = true;
-    public static final boolean backLeftReversed = false;
+    public static final boolean frontRightReversed = true;
+    public static final boolean backRightReversed = true;
+    public static final boolean frontLeftReversed = false;
+    public static final boolean backLeftReversed = true;
 
     //rotation encoder reversed 
     public static final boolean frontRightAbsReversed = true;

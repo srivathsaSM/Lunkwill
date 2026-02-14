@@ -24,7 +24,7 @@ public class RobotContainer {
     //twist is just twist
     swerveSubsystem.setDefaultCommand(new SwerveJoystick(
       swerveSubsystem,
-      () -> -joystick.getRawAxis(Constants.driverYAxis),
+      () -> joystick.getRawAxis(Constants.driverYAxis),
       () -> -joystick.getRawAxis(Constants.driverXAxis),
       () -> -joystick.getRawAxis(Constants.driverRotAxis),
       () -> joystick.getRawButton(Constants.driverFieldOrientedButtonIndex))); 

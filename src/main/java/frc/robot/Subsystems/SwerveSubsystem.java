@@ -1,16 +1,24 @@
 package frc.robot.Subsystems;
 
+import java.time.chrono.ThaiBuddhistChronology;
+
 import org.littletonrobotics.junction.Logger;
 
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.config.PIDConstants;
+import com.pathplanner.lib.config.RobotConfig;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.studica.frc.AHRS;
 import com.studica.frc.AHRS.NavXComType;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -95,10 +103,24 @@ public class SwerveSubsystem extends SubsystemBase {
       frontLeft.getModulePosition(),
       frontRight.getModulePosition(),
       backLeft.getModulePosition(),
-      backRight.getModulePosition()
-    };
+      backRight.getModulePosition()};
 
     odometer.resetPosition(getRotation2d(), modulePositions, pose);
+  }
+
+  public ChassisSpeeds getRobotRelativeSpeeds() {
+    SwerveModuleState[] states = {
+      frontLeft.getState(),
+      frontRight.getState(),
+      backLeft.getState(),
+      backRight.getState()};
+
+      return Constants.driveKinematics.toChassisSpeeds(states);
+  }
+
+  public void driveRobotRelative(ChassisSpeeds chassisSpeeds) {
+    ChassisSpeeds.discretize(chassisSpeeds, 0.02);
+    setModuleStates(Constants.driveKinematics.toSwerveModuleStates(chassisSpeeds));
   }
 
   @Override
@@ -154,5 +176,34 @@ public class SwerveSubsystem extends SubsystemBase {
     frontRight.setDesiredState(desiredStates[1]);
     backLeft.setDesiredState(desiredStates[2]);
     backRight.setDesiredState(desiredStates[3]);
+  }
+
+  public void configureAutoBuilder() {
+    System.out.println("Configuring Auto Builder... ");
+
+    try {
+      RobotConfig config = RobotConfig.fromGUISettings();
+
+      //configure autobuilder
+      AutoBuilder.configure(
+        this::getPose, //robot pose supplier
+        this::resetOdometry, //method to reset odometry
+        this::getRobotRelativeSpeeds, //robot relative ChassisSpeeds supplier
+        (speeds, feedforwards) -> driveRobotRelative(speeds), //drive the robot with chassis speeds and feedforwards
+        new PPHolonomicDriveController(
+          new PIDConstants(5.0, 0.0, 0.0), //translation PID
+          new PIDConstants(5.0, 0.0, 0.0)), //rotation PID
+        config, //robotconfig
+        () -> {
+          var alliance = DriverStation.getAlliance();
+          if (alliance.isPresent()) {
+            return alliance.get() == DriverStation.Alliance.Red;
+          }
+          return false;
+        },
+        this);
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
   }
 }

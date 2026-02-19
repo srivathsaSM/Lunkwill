@@ -99,6 +99,6 @@ public class Constants {
         new Translation2d(wheelBase/2, -trackWidth/2), //front left
         new Translation2d(wheelBase/2, trackWidth/2),  //front right
         new Translation2d(-wheelBase/2, -trackWidth/2), //back left
-        new Translation2d(-wheelBase/2, trackWidth/2));  //back right
+        new Translation2d(-wheelBase/2, trackWidth/2));  //back right    
 }
 

@@ -17,6 +17,7 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -100,6 +101,10 @@ public class SwerveModule extends SubsystemBase {
     return getAbsolutePosition() * Constants.rotationsToRad * (absoluteEncoderReversed ? -1.0 : 1.0);
   }
 
+  public SwerveModulePosition getModulePosition() {
+    return new SwerveModulePosition(getDrivePosition(), new Rotation2d(getRotationPosition()));
+  }
+
   public void resetEncoders() {
     //sets drive encoder to set the current position to 0
     //sets the rotation relative encoder sync with the absolute encoder
@@ -139,5 +144,6 @@ public class SwerveModule extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    
   }
 }

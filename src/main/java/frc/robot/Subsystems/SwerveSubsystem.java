@@ -5,8 +5,11 @@ import org.littletonrobotics.junction.Logger;
 import com.studica.frc.AHRS;
 import com.studica.frc.AHRS.NavXComType;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -51,6 +54,15 @@ public class SwerveSubsystem extends SubsystemBase {
           Constants.backRightRotReversed);
 
   private final AHRS gyro = new AHRS(NavXComType.kMXP_SPI);
+
+  public final SwerveModulePosition[] zeroModulePositions = {
+    new SwerveModulePosition(0,new Rotation2d(0)),
+    new SwerveModulePosition(0,new Rotation2d(0)),
+    new SwerveModulePosition(0,new Rotation2d(0)),
+    new SwerveModulePosition(0,new Rotation2d(0))
+  };
+
+  private final SwerveDriveOdometry odometer = new SwerveDriveOdometry(Constants.driveKinematics, new Rotation2d(0), zeroModulePositions);
   
   public SwerveSubsystem() {
       new Thread(() -> {
@@ -74,6 +86,21 @@ public class SwerveSubsystem extends SubsystemBase {
     return Rotation2d.fromDegrees(getHeading());
   }
 
+  public Pose2d getPose() {
+    return odometer.getPoseMeters();
+  }
+
+  public void resetOdometry(Pose2d pose) {
+    SwerveModulePosition[] modulePositions = {
+      frontLeft.getModulePosition(),
+      frontRight.getModulePosition(),
+      backLeft.getModulePosition(),
+      backRight.getModulePosition()
+    };
+
+    odometer.resetPosition(getRotation2d(), modulePositions, pose);
+  }
+
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
@@ -95,6 +122,18 @@ public class SwerveSubsystem extends SubsystemBase {
 
     SmartDashboard.putNumber("State Radians BL: ", backLeft.getState().angle.getRadians());
     SmartDashboard.putNumber("Actual Radians BL: ", backLeft.getRotationPosition());
+
+    SwerveModulePosition[] modulePositions = {
+      frontLeft.getModulePosition(),
+      frontRight.getModulePosition(),
+      backLeft.getModulePosition(),
+      backRight.getModulePosition()
+    };
+
+    odometer.update(getRotation2d(), modulePositions);
+
+    SmartDashboard.putNumber("Robot Heading: ", getHeading());
+    SmartDashboard.putString("Robot Location", getPose().getTranslation().toString());
   }
 
   public void stopModules() {
